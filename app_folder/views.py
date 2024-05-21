@@ -68,3 +68,8 @@ def menu_3():
 @login_required
 def admin_section():
     return render_template('admin_section.html', user=current_user)
+
+@views.route('/user_section')
+@login_required
+def user_section():
+    return render_template('user_section.html', user=current_user)

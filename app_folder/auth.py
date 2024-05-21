@@ -4,7 +4,7 @@ from hashlib import sha256
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
-from .models import User, Admin
+from .models import User, Admin, Project
 
 auth = Blueprint("auth", __name__)
 
@@ -38,42 +38,7 @@ def login():
                 return render_template('login.html', error="Nom d'utilisateur incorrect")
         return render_template('login.html')
 
-@auth.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
-        project_to_join = request.form.get('project_to_join')
-        
-        user = User.objects(username=username).first()
-        admin = Admin.objects(username=username).first()
-        project = Admin.objects(project_name=project_to_join).first()
-        
-        if user:
-            return render_template('register.html', error='Cet utilisateur existe déjà')
-        
-        if admin :
-            if username == admin.username:
-                return render_template('register.html', error='Cet utilisateur existe déjà')
-        
-        if len(username) < 4:
-            return render_template('register.html', error='Le nom d\'utilisateur doit contenir au moins 4 caractères')
-        
-        if len(password) < 4:
-            return render_template('register.html', error='Le mot de passe doit contenir au moins 4 caractères')
-        
-        if project is None:
-            return render_template('register.html', error='Ce projet n\'existe pas')
-        
-        if password == confirm_password:
-            hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-            new_user = User(username=username, password=hashed_password, project_name=project_to_join, roles='guest')
-            new_user.save()
-            return redirect(url_for('auth.login'))
-        else:
-            return render_template('register.html', error='Les mots de passe ne correspondent pas')
-    return render_template('register.html')
+
 
 @auth.route('/register_admin', methods=['GET', 'POST'])
 def register_admin():
@@ -101,13 +66,55 @@ def register_admin():
         
         if password == confirm_password:
             hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-            new_admin = Admin(username=username, password=hashed_password, project_name=project_name, roles='admin')
+            new_admin = Admin(username=username, password=hashed_password, roles='admin')
+            new_project = Project(project_name=project_name, admin=new_admin)
             flash('Nouveau projet créé avec succès !', category='success')
             new_admin.save()
+            new_project.save()
             return redirect(url_for('auth.login'))
         else:
             return render_template('register_admin.html', error='Les mots de passe ne correspondent pas')
     return render_template('register_admin.html')
+
+
+@auth.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        project_to_join = request.form.get('project_to_join')
+        
+        user = User.objects(username=username).first()
+        admin = Admin.objects(username=username).first()
+        project = Project.objects(project_name=project_to_join).first()
+        
+        if user:
+            return render_template('register.html', error='Cet utilisateur existe déjà')
+        
+        if admin :
+            if username == admin.username:
+                return render_template('register.html', error='Cet utilisateur existe déjà')
+        
+        if len(username) < 4:
+            return render_template('register.html', error='Le nom d\'utilisateur doit contenir au moins 4 caractères')
+        
+        if len(password) < 4:
+            return render_template('register.html', error='Le mot de passe doit contenir au moins 4 caractères')
+        
+        if project is None:
+            return render_template('register.html', error='Ce projet n\'existe pas')
+        
+        if password == confirm_password:
+            hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+            new_user = User(username=username, password=hashed_password, project_joined=project_to_join, roles='guest')
+            new_user.save()
+            return redirect(url_for('auth.login'))
+        else:
+            return render_template('register.html', error='Les mots de passe ne correspondent pas')
+    return render_template('register.html')
+
+
 
 @auth.route('/logout')
 # @login_required
