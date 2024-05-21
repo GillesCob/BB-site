@@ -9,10 +9,14 @@ views = Blueprint("views", __name__)
 def home_page():
     return render_template('home.html')
 
-@views.route('/menu_1', methods=['GET', 'POST'])
+@views.route('/menu_1')
 @login_required
 def menu_1():
-    
+    return render_template('menu_1.html', user=current_user)
+
+@views.route('/menu_2', methods=['GET', 'POST'])
+@login_required
+def menu_2():
     user = current_user
     
     if request.method == 'POST':
@@ -52,13 +56,7 @@ def menu_1():
 
         flash('Guess sauvegardée avec succès !')
 
-        return redirect(url_for('views.menu_1'))
-    
-    return render_template('menu_1.html', user=current_user)
-
-@views.route('/menu_2')
-@login_required
-def menu_2():
+        return redirect(url_for('views.menu_2'))
     return render_template('menu_2.html', user=current_user)
 
 @views.route('/menu_3')

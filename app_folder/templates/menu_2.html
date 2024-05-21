@@ -7,5 +7,27 @@
 
 {% block content %}
 <h1>Qui est-ce ?</h1>
+<form method="post">
+    <div class="form-group">
+        <label for="username">Sexe</label>
+        <input type="text" class="form-control" name="sexe" placeholder="Garçon ou Fille" >
+        <label for="username">Nom</label>
+        <input type="text" class="form-control" name="nom" placeholder="..." >
+        <label for="username">Poids</label>
+        <input type="text" class="form-control" name="poids" placeholder="Poids en g" >
+        <label for="username">Taille</label>
+        <input type="text" class="form-control" name="taille" placeholder="Taille en cm" >
+        <label for="username">date</label>
+        <input type="text" class="form-control" name="date" placeholder="JJ/MM" >
 
+        <button type="submit" class="btn btn-primary btn-block mt-3">Valider info</button>
+    </div>
+</form>
+
+<h1>Affichage d'Information</h1>
+{% if info %}
+    <p>Texte enregistré : {{ info.text }}</p>
+{% else %}
+    <p>Aucune information enregistrée.</p>
+{% endif %}
 {% endblock %}

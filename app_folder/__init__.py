@@ -19,7 +19,7 @@ MONGODB_PASSWORD = os.environ.get("MONGODB_PASSWORD")
 db = MongoEngine() #Je créé une instance de MongoEngine
 
 def create_app():
-    from .models import User
+    from .models import User, Admin
     
     app = Flask(__name__)
     SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -49,6 +49,11 @@ def create_app():
     
     @login_manager.user_loader #Fonction pour charger un utilisateur à partir de son ID. Utilisé par Flask-Login dans le fichier auth.py
     def load_user(user_id):
-        return User.objects(id=user_id).first()
+        user = User.objects(id=user_id).first()
+        if user:
+            return user
+        admin = Admin.objects(id=user_id).first()
+        if admin:
+            return admin
     
     return app
