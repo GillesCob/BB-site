@@ -47,15 +47,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="/logout">Se déconnecter</a>
                             </li>
-                            {% if current_user.is_authenticated and current_user.roles == 'admin' %}
                             <li class="nav-item">
-                                <a class="nav-link" href="/admin_section">Section admin</a>
+                                <a class="nav-link" href="/my_account">Mon Compte</a>
                             </li>
-                            {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="/user_section">Section user</a>
-                            </li>
-                            {% endif %}
                         </ul>
                     </div>
 

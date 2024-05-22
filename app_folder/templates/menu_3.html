@@ -8,4 +8,14 @@
 {% block content %}
 <h1>Photos</h1>
 
+{% if user_is_admin %}
+<p>Possible d'ajouter des photos</p>
+
+{%else%}
+<p>Possible de consulter les photos</p>
+
+{%endif%}
+
+
+
 {% endblock %}

@@ -8,12 +8,13 @@
 {% block content %}
 <h1>Liste de naissance</h1>
 
-<!-- <form id="textForm">
-    <label for="textInput">Entrez votre texte :</label><br>
-    <input type="text" id="textInput" name="textInput"><br><br>
-    <button type="submit" class="btn btn-primary btn-block mt-3">Valider info</button>
-</form>
-<div id="textDisplay"></div> -->
+{% if user_is_admin %}
+<p>Possible d'ajouter un produit à la liste de naissance</p>
+
+{%else%}
+<p>Possible de consulter les produits de la liste</p>
+
+{%endif%}
 
 
 

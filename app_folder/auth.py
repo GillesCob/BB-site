@@ -4,7 +4,7 @@ from hashlib import sha256
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
-from .models import User, Admin, Project
+from .models import User, Project
 
 auth = Blueprint("auth", __name__)
 
@@ -19,17 +19,10 @@ def login():
             password = request.form.get('password')
             
             user = User.objects(username=username).first()     
-            admin = Admin.objects(username=username).first()   
             
             if user :
                 if check_password_hash(user.password, password):
                     login_user(user, remember=True)
-                    return redirect(url_for('views.home_page'))
-                else:
-                    flash('Mauvais mot de passe !', category='error')
-            elif admin:
-                if check_password_hash(admin.password, password):
-                    login_user(admin, remember=True)
                     return redirect(url_for('views.home_page'))
                 else:
                     flash('Mauvais mot de passe !', category='error')
@@ -40,61 +33,20 @@ def login():
 
 
 
-@auth.route('/register_admin', methods=['GET', 'POST'])
-def register_admin():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
-        project_name  = request.form.get('project_name')
-        
-        admin = Admin.objects(username=username).first()
-        user = User.objects(username=username).first()
-                
-        if admin:
-            return render_template('register_admin.html', error='1 - Cet utilisateur existe déjà')
-        
-        if user:
-            if username == user.username:
-                return render_template('register_admin.html', error='2 - Cet utilisateur existe déjà')
-        
-        if len(username) < 4:
-            return render_template('register_admin.html', error='Le nom d\'utilisateur doit contenir au moins 4 caractères')
-        
-        if len(password) < 4:
-            return render_template('register_admin.html', error='Le mot de passe doit contenir au moins 4 caractères')
-        
-        if password == confirm_password:
-            hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-            new_admin = Admin(username=username, password=hashed_password, roles='admin')
-            new_project = Project(project_name=project_name, admin=new_admin)
-            flash('Nouveau projet créé avec succès !', category='success')
-            new_admin.save()
-            new_project.save()
-            return redirect(url_for('auth.login'))
-        else:
-            return render_template('register_admin.html', error='Les mots de passe ne correspondent pas')
-    return render_template('register_admin.html')
-
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
+    project_id = request.args.get('project_id')
+    
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
-        project_to_join = request.form.get('project_to_join')
         
         user = User.objects(username=username).first()
-        admin = Admin.objects(username=username).first()
-        project = Project.objects(project_name=project_to_join).first()
         
         if user:
             return render_template('register.html', error='Cet utilisateur existe déjà')
-        
-        if admin :
-            if username == admin.username:
-                return render_template('register.html', error='Cet utilisateur existe déjà')
         
         if len(username) < 4:
             return render_template('register.html', error='Le nom d\'utilisateur doit contenir au moins 4 caractères')
@@ -102,23 +54,55 @@ def register():
         if len(password) < 4:
             return render_template('register.html', error='Le mot de passe doit contenir au moins 4 caractères')
         
-        if project is None:
-            return render_template('register.html', error='Ce projet n\'existe pas')
-        
         if password == confirm_password:
             hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-            new_user = User(username=username, password=hashed_password, project_joined=project_to_join, roles='guest')
+            new_user = User(username=username, password=hashed_password)
+            
+            if project_id:
+                project = Project.objects(id=project_id).first()
+                if project:
+                    project_id = project.id
+                    new_user.project.append(project_id)
+                    
+                    
+            
             new_user.save()
             return redirect(url_for('auth.login'))
         else:
             return render_template('register.html', error='Les mots de passe ne correspondent pas')
     return render_template('register.html')
 
+@auth.route('/my_account', methods=['GET', 'POST'])
+@login_required
+def join_project():
+    if request.method == 'POST':
+        project_to_join = request.form.get('project_to_join')
+        project_to_join_id = project_to_join.split('=')[1]
+        project_to_join_name = Project.objects(id=project_to_join_id).first().name
+        current_user.project.append(project_to_join_id)
+        current_user.save()
+        print(f"{current_user.username} a les projets suivants : {current_user.project}")
+        flash(f'Vous avez rejoint le projet "{project_to_join_name}"', category='success')
+        return redirect(url_for('views.home_page'))
+    else:
+        return redirect(url_for('views.home_page'))
 
 
 @auth.route('/logout')
-# @login_required
+@login_required
 def logout():
     logout_user()
     flash('Déconnecté avec succès !', category='success')
+    return redirect(url_for('auth.login'))
+
+
+@auth.route('/delete', methods=['POST'])
+@login_required
+def delete_account():
+    # Récupérer l'utilisateur actuel et le supprimer de la base de données
+
+    user = User.objects(id=current_user.id).first()
+    if user:
+        user.delete()
+    flash('Compte supprimé avec succès !', category='success')
     return redirect(url_for('auth.login'))

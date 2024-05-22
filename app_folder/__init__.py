@@ -19,7 +19,7 @@ MONGODB_PASSWORD = os.environ.get("MONGODB_PASSWORD")
 db = MongoEngine() #Je créé une instance de MongoEngine
 
 def create_app():
-    from .models import User, Admin
+    from .models import User
     
     app = Flask(__name__)
     SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -52,8 +52,5 @@ def create_app():
         user = User.objects(id=user_id).first()
         if user:
             return user
-        admin = Admin.objects(id=user_id).first()
-        if admin:
-            return admin
     
     return app
