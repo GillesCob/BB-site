@@ -269,46 +269,6 @@ def create_project():
         
     return render_template('create_project.html', user=current_user)
 
-@views.route('/select_project', methods=['GET', 'POST'])
-@login_required
-def select_project():
-    projects = Project.objects(users__contains=current_user.id)
-    projects_dict = {}  
-    for project in projects:
-        projects_dict[project.name] = str(project.id)
-        
-        if request.method == 'POST':
-            project_id = request.form.get('project_id')
-            project_name = Project.objects(id=project_id).first().name
-            session['selected_project'] = {'id': project_id, 'name': project_name}
-            flash(f'Projet sélectionné avec succès. : {project_name}')
-            return redirect(url_for('views.my_account'))
-            
-    return render_template('select_project.html', user=current_user, projects_dict=projects_dict)
-
-@views.route('/delete_project', methods=['POST'])
-@login_required
-def delete_project():
-    # Récupérer le projet actuel et le supprimer de la base de données
-    username = current_user.username
-    admin = User.objects(username=username).first() #J'ai mon objet user qui est l'admin du projet que je souhaite supprimer
-    admin_id = admin.id #J'ai l'id de ce user
-    
-    project = Project.objects(admin=admin_id).first() #J'ai l'objet project que je souhaite supprimer pour lequel le user actuel est l'admin
-    project_id = project.id #J'ai l'id du projet à supprimer
-    
-    project_id_str = str(project_id)
-    admin.project.remove(project_id_str) #Je supprime l'id du projet de la liste des projets de l'admin
-    admin.save()
-
-    
-    # admin.update(pull__project=project_id) #Je supprime l'id du projet de la liste des projets de l'admin
-    
-    project.delete() #Je supprime le projet de la collection des projets
-    flash('Projet supprimé avec succès !', category='success')
-    return redirect(url_for('views.home_page'))
-
-
 @views.route('/my_account', methods=['GET', 'POST'])
 @login_required
 def join_project():
@@ -350,3 +310,52 @@ def join_project():
         
     else:
         return redirect(url_for('views.home_page'))
+
+@views.route('/select_project', methods=['GET', 'POST'])
+@login_required
+def select_project():
+    projects = Project.objects(users__contains=current_user.id)
+    projects_dict = {}  
+    for project in projects:
+        projects_dict[project.name] = str(project.id)
+        
+        if request.method == 'POST':
+            project_id = request.form.get('project_id')
+            project_name = Project.objects(id=project_id).first().name
+            session['selected_project'] = {'id': project_id, 'name': project_name}
+            flash(f'Projet sélectionné avec succès. : {project_name}')
+            return redirect(url_for('views.my_account'))
+            
+    return render_template('select_project.html', user=current_user, projects_dict=projects_dict)
+
+@views.route('/delete_project', methods=['POST'])
+@login_required
+def delete_project():
+    # Récupérer le projet actuel et le supprimer de la base de données
+
+    admin_id = current_user.id #J'ai l'id de ce user
+    
+    project = Project.objects(admin=admin_id).first() #J'ai l'objet project que je souhaite supprimer pour lequel le user actuel est l'admin
+    
+    project.delete() #Je supprime le projet de la collection des projets
+    
+    session.clear()
+    
+    #Je vais basculer la session sur la première que je trouve pour le user actuel
+
+    user_in_project = Project.objects(users__contains=admin_id)
+    if user_in_project:
+        first_project = user_in_project.first() 
+        first_project_id = first_project.id
+        
+        # Ajouter les données du premier projet trouvé dans la session
+        session['selected_project'] = {
+            'id': str(first_project_id),
+            'name': first_project.name
+            }
+    else:
+        flash("Veuillez créer ou rejoindre un projet avant d'accéder aux pronostics", category='error')
+        return redirect(url_for('views.my_account', user=current_user))
+    
+    flash('Projet supprimé avec succès !', category='success')
+    return redirect(url_for('views.home_page'))
