@@ -62,31 +62,6 @@ def register():
     return render_template('register.html')
 
 
-@auth.route('/my_account', methods=['GET', 'POST'])
-@login_required
-def join_project():
-    if request.method == 'POST':
-        project_to_join_link = request.form.get('project_to_join')
-        project_to_join_id = project_to_join_link.split('=')[1]
-        project_to_join_id = project_to_join_id.strip()
-        
-        project_to_join = Project.objects(id=project_to_join_id).first()
-        project_to_join_name = Project.objects(id=project_to_join_id).first().name
-        
-        project_to_join.users.append(current_user.id)
-        project_to_join.save()
-        
-        project_to_join_id = project_to_join.id
-        project_to_join_name = project_to_join.name
-        
-        session['selected_project'] = {'id': project_to_join_id, 'name': project_to_join_name}
-
-        flash(f'Vous avez rejoint le projet "{project_to_join_name}"', category='success')
-        return redirect(url_for('views.home_page'))
-    else:
-        return redirect(url_for('views.home_page'))
-
-
 @auth.route('/logout')
 @login_required
 def logout():
