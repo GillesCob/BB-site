@@ -24,8 +24,14 @@
         <p>Vous n'avez pas encore fait votre pronostic</p>
         <form method="post">
             <div class="form-group">
-                <label for="sexe">Sexe</label>
-                <input type="text" class="form-control" name="sexe" placeholder="Garçon ou Fille" required >
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="sexe" value="Garçon"> Garçon
+                    </label>
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="sexe" value="Fille"> Fille
+                    </label>
+                </div>
             </br>
                 <label for="name">Nom</label>
                 <input type="text" class="form-control" name="nom" placeholder="..." required>
