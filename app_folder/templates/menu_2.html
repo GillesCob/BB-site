@@ -6,28 +6,50 @@
 
 
 {% block content %}
-<h1>Qui est-ce ?</h1>
-<form method="post">
-    <div class="form-group">
-        <label for="username">Sexe</label>
-        <input type="text" class="form-control" name="sexe" placeholder="Garçon ou Fille" >
-        <label for="username">Nom</label>
-        <input type="text" class="form-control" name="nom" placeholder="..." >
-        <label for="username">Poids</label>
-        <input type="text" class="form-control" name="poids" placeholder="Poids en g" >
-        <label for="username">Taille</label>
-        <input type="text" class="form-control" name="taille" placeholder="Taille en cm" >
-        <label for="username">date</label>
-        <input type="text" class="form-control" name="date" placeholder="JJ/MM" >
+<h1>Pronostics</h1>
 
-        <button type="submit" class="btn btn-primary btn-block mt-3">Valider info</button>
-    </div>
-</form>
+{% if session.selected_project.id %}
+    Projet sélectionné : {{ session.selected_project.name }}
+    {% if pronostic_done %}
+        <p>Vous avez déjà fait votre pronostic</p>
+        Sexe : {{ prono_sexe }} </br>
+        Nom : {{ prono_nom }} </br>
+        Poids : {{ prono_poids }} grammes</br>
+        Taille : {{ prono_taille }} centimètres</br>
+        Date : {{ prono_date }} </br>
+        <div>
+            <button onclick="window.location.href='/update_pronostic'" class="btn btn-primary mt-4">Changer de pronostic</button>
+        </div>
+    {% else %}
+        <p>Vous n'avez pas encore fait votre pronostic</p>
+        <form method="post">
+            <div class="form-group">
+                <label for="sexe">Sexe</label>
+                <input type="text" class="form-control" name="sexe" placeholder="Garçon ou Fille" required >
+            </br>
+                <label for="name">Nom</label>
+                <input type="text" class="form-control" name="nom" placeholder="..." required>
+            </br>
+                <label for="weight">Poids</label>
+                <input type="text" class="form-control" name="poids" placeholder="Poids en g" required>
+            </br>
+                <label for="length">Taille</label>
+                <input type="text" class="form-control" name="taille" placeholder="Taille en cm" required>
+            </br>
+                <label for="date">date</label>
+                <input type="text" class="form-control" name="date" placeholder="JJ/MM" required>
+        
+                <button type="submit" class="btn btn-primary btn-block mt-3">Valider info</button>
+            </div>
+        </form>
+    {% endif %}
 
-<h1>Affichage d'Information</h1>
-{% if info %}
-    <p>Texte enregistré : {{ info.text }}</p>
 {% else %}
-    <p>Aucune information enregistrée.</p>
+Aucun projet sélectionné.
 {% endif %}
+</br>
+
+
+
+
 {% endblock %}

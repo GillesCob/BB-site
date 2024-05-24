@@ -25,6 +25,8 @@ def create_app():
     SECRET_KEY = os.environ.get("SECRET_KEY")
     app.config['SECRET_KEY'] = SECRET_KEY
     
+
+    
     
     #Import des routes depuis views.py-----------------------------------------------
     from .views import views
@@ -37,6 +39,7 @@ def create_app():
     
     app.config['MONGODB_HOST'] = f'mongodb+srv://{MONGODB_USERNAME}:{MONGODB_PASSWORD}@cluster0.fyqnwvu.mongodb.net/'
     app.config['MESSAGE_FLASHING_OPTIONS'] = {'duration': 5}
+    
 
     db.init_app(app)
     

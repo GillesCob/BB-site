@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Update pronostics
+{% endblock %}
+
+
+{% block content %}
+
+<h1>MAJ Pronostics</h1>
+
+<form method="post">
+    <div class="form-group">
+        <label for="sexe">Sexe</label>
+        <input type="text" class="form-control" name="sexe_new_proposition" placeholder="{{prono_sexe}}">
+    </br>
+        <label for="name">Nom</label>
+        <input type="text" class="form-control" name="nom_new_proposition" placeholder="{{prono_nom}}">
+    </br>
+        <label for="weight">Poids</label>
+        <input type="text" class="form-control" name="poids_new_proposition" placeholder="{{prono_poids}}">
+    </br>
+        <label for="length">Taille</label>
+        <input type="text" class="form-control" name="taille_new_proposition" placeholder="{{prono_taille}}">
+    </br>
+        <label for="date">date</label>
+        <input type="text" class="form-control" name="date_new_proposition" placeholder="{{prono_date}}">
+    </br>
+        <button type="submit" class="btn btn-primary btn-block mt-3">Valider les modifications</button>
+    </div>
+</form>
+
+
+{% endblock %}
