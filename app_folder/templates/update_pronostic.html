@@ -14,28 +14,61 @@
     <div class="form-group">
         <div class="btn-group btn-group-toggle" data-toggle="buttons">
             <label class="btn btn-secondary">
-                <input type="radio" name="sexe_new_proposition" value="Garcon" autocomplete="off" {% if prono_sexe == 'Garçon' %}checked{% endif %}> Garçon
+                <input type="radio" name="sex" value="Garçon" autocomplete="off" {% if prono_sex == 'Garçon' %} checked {% endif %}> Garçon</input>
             </label>
             <label class="btn btn-secondary">
-                <input type="radio" name="sexe_new_proposition" value="Fille" autocomplete="off" {% if prono_sexe == 'Fille' %}checked{% endif %}> Fille
+                <input type="radio" name="sex" value="Fille" autocomplete="off" {% if prono_sex == 'Fille' %}checked{% endif %}> Fille</input>
             </label>
         </div>        
     </br>
-        <label for="name">Nom</label>
-        <input type="text" class="form-control" name="nom_new_proposition" placeholder="{{prono_nom}}">
     </br>
-        <label for="weight">Poids</label>
-        <input type="text" class="form-control" name="poids_new_proposition" placeholder="{{prono_poids}}">
+        <label for="name" >Nom</label>
+        <input type="text" class="form-control" name="name" placeholder="{{prono_name}}">
     </br>
-        <label for="length">Taille</label>
-        <input type="text" class="form-control" name="taille_new_proposition" placeholder="{{prono_taille}}">
     </br>
-        <label for="date">date</label>
-        <input type="text" class="form-control" name="date_new_proposition" placeholder="{{prono_date}}">
+        <label for="weight" class="form-label">Poids</label>
+        <input type="range" class="form-range" id="weight" name="weight" min="2.5" max="4.5" step="0.001" oninput="updateWeightValue(this.value)">
+        <span id="weightValue">{{prono_weight}}</span> kilos
+    </br>
+    </br>
+        <label for="height" class="form-label">Taille</label>
+        <input type="range" class="form-range" id="height" name="height" min="30" max="60" step="0.1" oninput="updateHeightValue(this.value)">
+        <span id="heightValue">{{prono_height}}</span> Centimètres
+
+    </br>
+    </br>
+        <label for="date">Date</label>
+        <input type="date" class="form-control" name="date" id="date" placeholder="Date fournie : {{prono_date}}">
     </br>
         <button type="submit" class="btn btn-primary btn-block mt-3">Valider les modifications</button>
     </div>
 </form>
+
+
+<script>
+    // Fonction pour mettre à jour la valeur du poids
+    function updateWeightValue(value) {
+        document.getElementById("weightValue").textContent = value;
+    }
+    // Fonction pour mettre à jour la valeur de la taille
+    function updateHeightValue(value) {
+        document.getElementById("heightValue").textContent = value;
+    }
+
+    // Mettre à jour la valeur de départ du curseur pour le poids
+    window.onload = function() {
+        var Initialweight = "{{prono_weight}}";
+        document.getElementById("weight").value = Initialweight;
+        updateWeightValue(Initialweight);
+
+    // Mettre à jour la valeur de départ du curseur pour la taille
+        var Initialheight = "{{prono_height}}";
+        document.getElementById("height").value = Initialheight;
+        updateHeightValue(Initialheight);
+    };
+
+
+</script>
 
 
 {% endblock %}

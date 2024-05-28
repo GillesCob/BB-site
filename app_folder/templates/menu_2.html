@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Menu 2
+    Pronostics
 {% endblock %}
 
 
@@ -11,11 +11,16 @@
 {% if session.selected_project.id %}
     Projet sélectionné : {{ session.selected_project.name }}
     {% if pronostic_done %}
+        <div>
+            <button onclick="window.location.href='/menu_2'" class="btn btn-secondary mt-4">Mon pronostic</button>
+
+            <button onclick="window.location.href='/all_pronostics'" class="btn btn-primary mt-4">Synthèse des pronostics</button>
+        </div>
         <p>Vous avez déjà fait votre pronostic</p>
-        Sexe : {{ prono_sexe }} </br>
-        Nom : {{ prono_nom }} </br>
-        Poids : {{ prono_poids }} grammes</br>
-        Taille : {{ prono_taille }} centimètres</br>
+        Sexe : {{ prono_sex }} </br>
+        Nom : {{ prono_name }} </br>
+        Poids : {{ prono_weight }} kilogrammes</br>
+        Taille : {{ prono_height }} centimètres</br>
         Date : {{ prono_date }} </br>
         <div>
             <button onclick="window.location.href='/update_pronostic'" class="btn btn-primary mt-4">Changer de pronostic</button>
@@ -26,27 +31,31 @@
             <div class="form-group">
                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
                     <label class="btn btn-secondary">
-                        <input type="radio" name="sexe" value="Garçon"> Garçon
+                        <input type="radio" name="sex" value="Garçon">Garçon</input>
                     </label>
                     <label class="btn btn-secondary">
-                        <input type="radio" name="sexe" value="Fille"> Fille
+                        <input type="radio" name="sex" value="Fille">Fille</input>
                     </label>
                 </div>
             </br>
                 <label for="name">Nom</label>
-                <input type="text" class="form-control" name="nom" placeholder="..." required>
+                <input type="text" class="form-control" name="name" placeholder="..." required>
             </br>
-                <label for="weight">Poids</label>
-                <input type="text" class="form-control" name="poids" placeholder="Poids en g" required>
+                <label for="weight" class="form-label">Poids</label>
+                <input type="range" class="form-range" id="weight" name="weight" min="2.5" max="4.5" step="0.1" oninput="updateWeightValue(this.value)">
+                <span id="weightValue">3,5</span> kilos
+
             </br>
-                <label for="length">Taille</label>
-                <input type="text" class="form-control" name="taille" placeholder="Taille en cm" required>
+                <label for="height" class="form-label">Taille</label>
+                <input type="range" class="form-range" id="height" name="height" min="30" max="60" step="0.1" oninput="updateHeightValue(this.value)">
+                <span id="heightValue">45</span> Centimètres
+
             </br>
-                <label for="date">date</label>
-                <input type="text" class="form-control" name="date" placeholder="JJ/MM" required>
-        
-                <button type="submit" class="btn btn-primary btn-block mt-3">Valider info</button>
+                <label for="date">Date</label>
+                <input type="date" class="form-control" name="date" required>
             </div>
+            <button type="submit" class="btn btn-primary btn-block mt-3">Valider info</button>
+
         </form>
     {% endif %}
 
@@ -55,7 +64,14 @@ Aucun projet sélectionné.
 {% endif %}
 </br>
 
-
+<script>
+    function updateWeightValue(value) {
+        document.getElementById("weightValue").textContent = value;
+    }
+    function updateHeightValue(value) {
+        document.getElementById("heightValue").textContent = value;
+    }
+</script>
 
 
 {% endblock %}

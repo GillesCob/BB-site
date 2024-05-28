@@ -7,9 +7,20 @@
 
 {% block content %}
 
+
 {% if user_is_admin %}
 </br>
-Lien d'affiliation : http://127.0.0.1:5000/register?project_id={{project_id}} </br>
+<div class="container d-flex justify-content-center align-items-center">
+    <button class="btn btn-primary" onclick="copyTextToClipboard()">Copier votre lien d'affiliation</button>
+</div>
+<!-- Lien d'affiliation : http://127.0.0.1:5000/register?project_id={{project_id}} </br> -->
+
+
+<div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
+    <div class="d-grid gap-2 col-12 mx-auto">
+        <a href="/rename_project" class="btn btn-primary">Renommer le projet {{project_name}}</a>
+    </div>
+</div>
 
 <div class="container d-flex justify-content-center align-items-center">
     <button onclick="openModal_delete_project()" class="btn btn-danger mt-4">Supprimer votre projet</button>
@@ -26,15 +37,28 @@ Lien d'affiliation : http://127.0.0.1:5000/register?project_id={{project_id}} </
 {%endif%}
 
 
+<!-- <div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
+    <div class="d-grid gap-2 col-12 mx-auto">
+        <a href="/change_email" class="btn btn-primary">Changer d'adresse mail</a>
+    </div>
+</div> -->
+
+<div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
+    <div class="d-grid gap-2 col-12 mx-auto">
+        <a href="/change_password" class="btn btn-primary">Changer de mot de passe</a>
+    </div>
+</div>
+
 <!-- Permettre de rejoindre un projet existant -->
 <div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
-    <p>Vous souhaitez rejoindre un projet déjà existant ?</p>
-    <p>Ajoutez ci-dessous le lien d'affiliation : </p>
+    
     <div class="container d-flex justify-content-center align-items-center">
         <div class="card p-3">
             <form method="post">
+                <p>Vous souhaitez rejoindre un projet déjà existant ?</p>
+
                 <div class="form-group">
-                    <input type="text" class="form-control" name="project_to_join" placeholder="http://..." required>
+                    <input type="text" class="form-control text-center" name="project_to_join" placeholder="lien d'affiliation" required>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block mt-3">Rejoindre</button>
             </form>
@@ -47,18 +71,6 @@ Lien d'affiliation : http://127.0.0.1:5000/register?project_id={{project_id}} </
     <button onclick="openModal_delete_profil()" class="btn btn-danger mt-4">Supprimer votre profil</button>
 </div>
 
-
-{% if count_projects > 1 %}
-<div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
-    <button onclick="window.location.href='/select_project'" class="btn btn-primary mt-4">Interragir avec un autre projet</button>
-</div>
-
-{% if session.selected_project %}
-Projet sélectionné : {{ session.selected_project.name }}
-{% else %}
-Aucun projet sélectionné.
-{% endif %}
-{% endif %}
 
 
 
@@ -141,5 +153,17 @@ function closeModal_delete_project() {
     document.getElementById('myModal_delete_project').style.display = 'none';
 }
 </script>
+
+<script>
+    function copyTextToClipboard() {
+        const textToCopy = "http://127.0.0.1:5000/register?project_id={{project_id}}";
+        navigator.clipboard.writeText(textToCopy).then(function() {
+            alert("Lien d'affiliation copié: ");
+        }, function(err) {
+            console.error('Erreur lors de la copie du texte: ', err);
+        });
+    }
+</script>
+
 
 {% endblock %}

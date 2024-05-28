@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    All pronostics
+{% endblock %}
+
+
+{% block content %}
+<h1>Synthèse des Pronostics</h1>
+
+{% if session.selected_project.id %}
+    Projet sélectionné : {{ session.selected_project.name }}
+        <div>
+            <button onclick="window.location.href='/menu_2'" class="btn btn-primary mt-4">Mon pronostic</button>
+
+            <button onclick="window.location.href='/all_pronostics'" class="btn btn-secondary mt-4">Synthèse des pronostics</button>
+        </div>
+        <p>On va retrouver ici la moyenne des pronos pour le projet {{ session.selected_project.name }}</p>
+        <!-- <label for="sex" class="form-label">Sexe</label>
+        <input type="range" class="form-range" id="sex" name="sex" min="0" max="100" step="1" oninput="updateSexValue(this.value)">
+        <span id="sexValue">{{percentage_girl}}</span> % -->
+
+
+        <div class="progress-container">
+            <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="{{ percentage_girl }}" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar progress-bar-custom" style="width: {{ percentage_girl }}%;"></div>
+            </div>
+            <div class="progress-label label-left">Fille - {{ percentage_girl }}%</div>
+            <div class="progress-label label-right">Garçon - {{ percentage_boy }}%</div>
+        </div>
+
+
+    </br>
+        Poids moyen : {{ average_weight }} kilogrammes</br>
+        Taille moyen : {{ average_height }} centimètres</br>
+        Date moyenne : {{ average_date }} </br>
+        
+        {% for name, count in names.items() %}
+            {%if count > 1%}
+            Prénoms proposés : 
+            <ul>
+                    <li>{{ name }} ({{ count }})</li>
+                
+            </ul>
+            {%endif%}
+        {% endfor %}
+
+{% endif %}
+
+<style>
+.progress {
+    background-color: #2d2ddd; /* Couleur de fond du reste à faire */
+  }
+.progress-bar-custom {
+    background-color: #c21ea4; /* Couleur de la barre de progression */
+  }
+</style>
+
+<script>
+    function updateSexValue(value) {
+        document.updateSexValue("sexValue").textContent = value;
+    }
+</script>
+
+
+{% endblock %}

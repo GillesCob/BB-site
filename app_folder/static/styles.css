@@ -1,15 +1,15 @@
 /* styles.css */
 
 /* Center the container vertically and horizontally */
-.container {
+/* .container {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-}
+} */
 
 /* Add padding and background color to the card */
-.card {
+/* .card {
     padding: 20px;
     background-color: #f8f9fa;
     border: none;
@@ -17,28 +17,28 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
-}
+} */
 
 /* Add space between form elements */
-.form-group {
+/* .form-group {
     margin-bottom: 20px;
-}
+} */
 
 /* Center the button within its container */
-.btn-block {
+/* .btn-block {
     display: block;
     width: 100%;
-}
+} */
 
 /* Center the text within the card */
-.text-center {
+/* .text-center {
     text-align: center;
-}
+} */
 
 /* Add margin to the top of the "Already have an account?" message */
-.mt-3 {
+/* .mt-3 {
     margin-top: 15px;
-}
+} */
 
 
 /* Elements pour les fenêtres modales */
@@ -60,4 +60,40 @@
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
+}
+
+input[type="date"]:before {
+    content: attr(placeholder) !important;
+    color: #aaa;
+    margin-right: 0.5em;
+  }
+  input[type="date"]:focus:before,
+  input[type="date"]:valid:before {
+    content: "";
+  }
+
+.progress-container {
+    position: relative;
+}
+
+.progress {
+    background-color: #2d2ddd; /* Couleur de fond du reste à faire */
+  }
+.progress-bar-custom {
+    background-color: #c21ea4; /* Couleur de la barre de progression */
+  }
+
+.progress-label {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+}
+
+.label-left {
+    left: 10px;
+}
+
+.label-right {
+    right: 10px;
 }
