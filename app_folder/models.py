@@ -22,7 +22,7 @@ class Project(Document):
 
 
 class Pronostic(Document):
-    meta = {'collection': 'Pronostic_collection'}
+    meta = {'collection': 'Pronostics_collection'}
     
     user = ReferenceField('User', reverse_delete_rule=CASCADE)
     project = ReferenceField('Project', reverse_delete_rule=CASCADE)
@@ -31,3 +31,15 @@ class Pronostic(Document):
     weight = StringField(max_length=150, required=True)
     height = StringField(max_length=150, required=True)
     date = StringField(max_length=150, required=True)
+    
+class Product(Document):
+    meta = {'collection': 'Products_collection'}
+    
+    name = StringField(max_length=150)
+    description = StringField(max_length=150)
+    price = StringField(max_length=150)
+    image = StringField(max_length=150)
+    website = StringField(max_length=150)
+    url_source = StringField(max_length=150)
+    percentage_paid = StringField(max_length=150)
+    
