@@ -254,6 +254,7 @@ def update_pronostic():
 @views.route('/all_pronostics', methods=['GET', 'POST'])
 @login_required
 def all_pronostics():
+    user = current_user
     user_id = current_user.id
     elements_for_base = elements_for_base_template(user_id)
     
@@ -264,6 +265,17 @@ def all_pronostics():
     pronostics = Pronostic.objects(id__in=pronostic_ids)
     
     user_id = current_user.id
+    
+    #Je récupère le sexe choisi par le user afin de mettre à jour les couleurs en conséquence
+    current_project_id = session['selected_project']['id'] #J'ai l'id du projet actuellement sauvegardé dans la session
+    current_project = Project.objects(id=current_project_id).first() #J'ai l'objet Project actuellement sauvegardé dans la session
+    pronostics_for_current_project = current_project.pronostic #J'ai la liste des pronostics pour le projet actuellement sauvegardé dans la session
+
+    for pronostic in user.pronostic:
+        if pronostic in pronostics_for_current_project:
+            pronostic_utilisateur = Pronostic.objects(id=pronostic).first()
+            prono_sex = pronostic_utilisateur.sex
+    
     
     number_of_pronostics = len(pronostics)
     sex_girl = 0
@@ -313,7 +325,7 @@ def all_pronostics():
     names = dict(sorted(names.items(), key=lambda item: item[1], reverse=True))
 
     
-    return render_template('all_pronostics.html', average_weight=average_weight, average_height=average_height, average_date=average_date, percentage_girl=percentage_girl, percentage_boy=percentage_boy, names=names, **elements_for_base)
+    return render_template('all_pronostics.html', average_weight=average_weight, average_height=average_height, average_date=average_date, percentage_girl=percentage_girl, percentage_boy=percentage_boy, names=names, **elements_for_base, prono_sex=prono_sex)
 
 
 #ROUTES "PHOTOS" -------------------------------------------------------------------------------------------------------------
@@ -428,7 +440,7 @@ def create_project():
             }
         
         flash(f'Projet "{new_project.name}" créé avec succès !', category='success')
-        return redirect(url_for('views.home_page', **elements_for_base))
+        return redirect(url_for('views.menu_2', **elements_for_base))
         
     return render_template('create_project.html', user=current_user, **elements_for_base)
 

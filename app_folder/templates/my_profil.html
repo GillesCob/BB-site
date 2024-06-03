@@ -6,22 +6,19 @@
 
 
 {% block content %}
-<div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
-    <div class="d-grid gap-2 col-12 mx-auto">
+<div class="container">
+    <div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
         <a href="/change_email" class="btn btn-primary">Changer d'adresse mail</a>
     </div>
-</div>
 
-<div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
-    <div class="d-grid gap-2 col-12 mx-auto">
+    <div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
         <a href="/change_password" class="btn btn-primary">Changer de mot de passe</a>
     </div>
-</div>
 
-<div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
-    <button onclick="openModal_delete_profil()" class="btn btn-danger mt-4">Supprimer votre profil</button>
+    <div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
+        <button onclick="openModal_delete_profil()" class="btn btn-danger mt-4">Supprimer votre profil</button>
+    </div>
 </div>
-
 
 <!-- Styles pour la fenêtre modale -->
 <style>
@@ -54,7 +51,6 @@
     <span onclick="closeModal_delete_profil()" style="float:right;">&times;</span>
         <div class="col offset-md-3 col-md-6 col-sm-12">
             <form method="POST" action="{{ url_for('auth.delete_account') }}" class="p-5 text-center">
-                <p>Êtes-vous sûr(e) de vouloir supprimer votre profil ?</p>
                 <p>ATTENTION cette action est irréversible !</p>
                 <div class="d-grid gap-2 col-12 mx-auto">
                     <button type="submit" class="btn btn-danger">Supprimer mon profil</button>

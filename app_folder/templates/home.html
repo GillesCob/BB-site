@@ -6,7 +6,17 @@
 
 {% block content %}
 
-<h3>Bienvenue</h3>
+<div class="text-center">
+    <h3>Bienvenue</h3>
+    <p>Voici les différents choix possibles : </p>
+</div>
+
+<div class="all_btn">
+    <button type="button" class="pronostics_btn btn_not_selected" onclick="window.location.href='/my_projects'">Gérer mes projet</button>
+    <button type="button" class="pronostics_btn btn_not_selected" onclick="window.location.href='/my_profil'">Gérer mon profil</button>   
+
+</div>
+
 
 
 {% endblock %}

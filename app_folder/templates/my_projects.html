@@ -7,62 +7,56 @@
 
 {% block content %}
 
+<div class="container">
+    {% if user_is_admin %}
 
-{% if user_is_admin %}
-    <h1 class="text-center">Mon projet {{project_name}}</h1>
-    </br>
-    <div class="col offset-md-3 col-md-6 col-sm-12 text-center">
-        <button class="btn btn-primary" onclick="copyTextToClipboard()">Copier votre lien d'affiliation</button>
-    </div>
-    <!-- Lien d'affiliation : http://127.0.0.1:5000/register?project_id={{project_id}} </br> -->
+        <h1 class="page_title">Mon projet {{project_name}}</h1>
+        </br>
+        <div class="col offset-md-3 col-md-6 col-sm-12 text-center">
+            <button class="btn btn-primary" onclick="copyTextToClipboard()">Copier votre lien d'affiliation</button>
+        </div>
+
+        <div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
+                <a href="/rename_project" class="btn btn-primary">Renommer le projet {{project_name}}</a>
+        </div>
+
+        <div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4 mb-5">
+            <button onclick="openModal_delete_project()" class="btn btn-danger">Supprimer votre projet</button>
+        </div>
+
+    {%else%}
+        <div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
+            <div class="d-grid gap-2 col-12 mx-auto">
+                <a href="/create_project" class="btn btn-primary">Créer un projet</a>
+            </div>
+        </div>
+    {%endif%}
 
 
-    <div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
-            <a href="/rename_project" class="btn btn-primary">Renommer le projet {{project_name}}</a>
-    </div>
+<hr>
 
-    <div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
-        <button onclick="openModal_delete_project()" class="btn btn-danger">Supprimer votre projet</button>
-    </div>
 
-{%else%}
+    <h1 class="page_title mt-4">Les projets dont je fais partie</h1>
+    {%if projects_dict_special %}
+        {% for project_name, project_id in projects_dict_special.items() %}
+            <div class="container d-flex justify-content-center align-items-center">
+                <h3>{{ project_name }}</h3>
+            </div>
+        {% endfor %}
+    {%else%}
+        <div class="text-center">
+            <p>Aucun projet rejoint pour le moment.</p>
+        </div>
+        
+    {%endif%}
+
+
     <div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
         <div class="d-grid gap-2 col-12 mx-auto">
-            <a href="/create_project" class="btn btn-primary">Créer un projet</a>
+            <a href="/join_project" class="btn btn-primary">Rejoindre un projet</a>
         </div>
-    </div>
-{%endif%}
-
-{%if count_projects == 0%}
-{%else%}
-    <h1 class="text-center mt-5">Les projets dont je fais partie</h1>
-    {% for project_name, project_id in projects_dict_special.items() %}
-        <div class="container d-flex justify-content-center align-items-center">
-            <h3>{{ project_name }}</h3>
-        </div>    
-    {% endfor %}
-{%endif%}
-
-
-<div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-4">
-    <div class="d-grid gap-2 col-12 mx-auto">
-        <a href="/join_project" class="btn btn-primary">Rejoindre un projet</a>
     </div>
 </div>
-<!-- Permettre de rejoindre un projet existant
-<div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-5">
-    <div class="container d-flex justify-content-center align-items-center">
-        <div class="card p-3">
-            <form method="post" >
-                <p>Vous souhaitez rejoindre un projet déjà existant ?</p>
-                <div class="form-group">
-                    <input type="text" class="form-control text-center" name="project_to_join" placeholder="lien d'affiliation" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block mt-3">Rejoindre</button>
-            </form>
-        </div>
-    </div>    
-</div> -->
 
 
 <!-- Styles pour la fenêtre modale -->
@@ -95,9 +89,7 @@
     <div class="modal-content">
     <span onclick="closeModal_delete_project()" style="float:right;">&times;</span>
         <div class="col offset-md-3 col-md-6 col-sm-12">
-            <form method="POST" action="{{ url_for('views.delete_project') }}" class="p-5 text-center">
-                <p>Êtes-vous sûr(e) de vouloir supprimer "{{project_name}}" ? </p> 
-            
+            <form method="POST" action="{{ url_for('views.delete_project') }}" class="p-5 text-center">        
                 <p>ATTENTION Cette action est irréversible !</p> 
                 <div class="d-grid gap-2 col-12 mx-auto">
                     <button type="submit" class="btn btn-danger">Supprimer mon projet</button>

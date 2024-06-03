@@ -33,10 +33,12 @@ def login():
                         user_id = user.id
                         project.update(push__users=user_id)
                         flash(f'Projet {project_name} rejoint avec succès !', category='success')
+                        login_user(user, remember=True)
+                        return redirect(url_for('views.menu_2', count_projects=count_projects))
                     
-                    login_user(user, remember=True)
-                    
-                    return redirect(url_for('views.home_page', count_projects=count_projects))
+                    else:
+                        login_user(user, remember=True)
+                        return redirect(url_for('views.home_page', count_projects=count_projects))
                 else:
                     flash('Mauvais mot de passe !', category='error')
             

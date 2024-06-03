@@ -6,43 +6,112 @@
 
 
 {% block content %}
+<div class="container">
+    <h6>Mise à jour de votre pronostic</h6>
 
-<h1>MAJ Pronostics</h1>
 
-<form method="post">
+    <form method="post">
+
+        <!-- Le sexe ----------------------------------------- -->
+        <div class = "guess_title">
+            <label for="name" >Le sexe</label>
+        </div>
+        
+        
+        <input type="hidden" id="selectedGender" name="sex" value="{{ prono_sex }}">
+        <div class="buttons all_btn">
+            <button type="button" id="btn-girl" class="my_btn guess_btn guess_btn_girl" onclick="selectGender('Fille')">Fille</button>
+            <button type="button" id="btn-boy" class="my_btn guess_btn guess_btn_boy" onclick="selectGender('Garçon')">Garçon</button>
+        </div>
+
+        
+
+        
+        
+        <!-- Le nom ----------------------------------------- -->
+        <div class = "guess_title">
+            <label for="name" >Le nom</label>
+        </div>
+        <input type="text" class="form-control text-center" name="name" placeholder="{{prono_name}}">
+        
+        
+        <!-- Le poids ----------------------------------------- -->
+        <div class = "guess_title">
+            <label for="weight" >Le poids</label>
+        </div>
+        <div class="text-center">
+            <input type="range" class="form-range" id="weight" name="weight" min="2.5" max="4.5" step="0.1" oninput="updateWeightValue(this.value)">
+            <span id="weightValue">{{prono_weight}}</span> kilos
+        </div>
+        
+        
+        <!-- La taille ----------------------------------------- -->
+        <div class = "guess_title">
+            <label for="height" >La taille</label>
+        </div>
+        <div class="text-center">
+            <input type="range" class="form-range" id="height" name="height" min="30" max="60" step="0.1" oninput="updateHeightValue(this.value)">
+            <span id="heightValue">{{prono_height}}</span> Centimètres
+        </div>
+        
+        
+        <!-- La date ----------------------------------------- -->
+        <div class = "guess_title">
+            <label for="date" >La date</label>
+        </div>
+
+        <div class = "date_birth">
+            <input type="date" class="form-control text-center narrow-input" name="date" placeholder="{{prono_date}}">
+        </div>
+        
+        <!-- Validation du pronostic ----------------------------------------- -->
+        <div class="text-center">
+            {%if prono_sex == "Fille"%}
+                <button onclick="window.location.href='/update_pronostic'" class="my_btn validate-btn gender_girl">Changer de pronostic</button>
+            {%else%}
+                <button onclick="window.location.href='/update_pronostic'" class="my_btn validate-btn gender_boy">Changer de pronostic</button>
+            {%endif%}
+        </div>
     
-    <div class="form-group">
-        <div class="btn-group btn-group-toggle" data-toggle="buttons">
-            <label class="btn btn-secondary">
-                <input type="radio" name="sex" value="Garçon" autocomplete="off" {% if prono_sex == 'Garçon' %} checked {% endif %}> Garçon</input>
-            </label>
-            <label class="btn btn-secondary">
-                <input type="radio" name="sex" value="Fille" autocomplete="off" {% if prono_sex == 'Fille' %}checked{% endif %}> Fille</input>
-            </label>
-        </div>        
-    </br>
-    </br>
-        <label for="name" >Nom</label>
-        <input type="text" class="form-control" name="name" placeholder="{{prono_name}}">
-    </br>
-    </br>
-        <label for="weight" class="form-label">Poids</label>
-        <input type="range" class="form-range" id="weight" name="weight" min="2.5" max="4.5" step="0.001" oninput="updateWeightValue(this.value)">
-        <span id="weightValue">{{prono_weight}}</span> kilos
-    </br>
-    </br>
-        <label for="height" class="form-label">Taille</label>
-        <input type="range" class="form-range" id="height" name="height" min="30" max="60" step="0.1" oninput="updateHeightValue(this.value)">
-        <span id="heightValue">{{prono_height}}</span> Centimètres
+    </form>
+    
+    <!-- <form method="post">
+        
+        <div class="form-group">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-secondary">
+                    <input type="radio" name="sex" value="Garçon" autocomplete="off" {% if prono_sex == 'Garçon' %} checked {% endif %}> Garçon</input>
+                </label>
+                <label class="btn btn-secondary">
+                    <input type="radio" name="sex" value="Fille" autocomplete="off" {% if prono_sex == 'Fille' %}checked{% endif %}> Fille</input>
+                </label>
+            </div>        
+        </br>
+        </br>
+            <label for="name" >Nom</label>
+            <input type="text" class="form-control" name="name" placeholder="{{prono_name}}">
+        </br>
+        </br>
+            <label for="weight" class="form-label">Poids</label>
+            <input type="range" class="form-range" id="weight" name="weight" min="2.5" max="4.5" step="0.001" oninput="updateWeightValue(this.value)">
+            <span id="weightValue">{{prono_weight}}</span> kilos
+        </br>
+        </br>
+            <label for="height" class="form-label">Taille</label>
+            <input type="range" class="form-range" id="height" name="height" min="30" max="60" step="0.1" oninput="updateHeightValue(this.value)">
+            <span id="heightValue">{{prono_height}}</span> Centimètres
+    
+        </br>
+        </br>
+            <label for="date">Date</label>
+            <input type="date" class="form-control" name="date" id="date" placeholder="Date fournie : {{prono_date}}">
+        </br>
+            <button type="submit" class="btn btn-primary btn-block mt-3">Valider les modifications</button>
+        </div>
+    </form> -->
 
-    </br>
-    </br>
-        <label for="date">Date</label>
-        <input type="date" class="form-control" name="date" id="date" placeholder="Date fournie : {{prono_date}}">
-    </br>
-        <button type="submit" class="btn btn-primary btn-block mt-3">Valider les modifications</button>
-    </div>
-</form>
+</div>
+
 
 
 <script>
@@ -66,6 +135,56 @@
         document.getElementById("height").value = Initialheight;
         updateHeightValue(Initialheight);
     };
+
+
+
+
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+    // Get the value of the selected gender from the hidden input
+    const selectedGender = document.getElementById('selectedGender').value;
+
+    // Function to update the button styles based on the selected gender
+    function updateButtonStyles(gender) {
+        // Remove the 'selected' class from both buttons
+        document.getElementById('btn-girl').classList.remove('selected');
+        document.getElementById('btn-boy').classList.remove('selected');
+
+        // Add the 'selected' class to the appropriate button
+        if (gender === 'Fille') {
+            document.getElementById('btn-girl').classList.add('selected');
+        } else if (gender === 'Garçon') {
+            document.getElementById('btn-boy').classList.add('selected');
+        }
+    }
+
+    // Update the button styles on page load
+    updateButtonStyles(selectedGender);
+
+    // Function to handle gender selection
+    window.selectGender = function(gender) {
+
+        // Update the hidden input value
+        document.getElementById('selectedGender').value = gender;
+
+        // Update the button styles
+        updateButtonStyles(gender);
+
+        // Update the validate button color
+        const validateBtn = document.querySelector('.validate-btn');
+        validateBtn.classList.remove('gender_girl', 'gender_boy', 'no_gender');
+        if (gender === 'Fille') {
+            validateBtn.classList.add('gender_girl');
+        } else if (gender === 'Garçon') {
+            validateBtn.classList.add('gender_boy');
+        } else {
+            validateBtn.classList.add('no_gender');
+        }
+    }
+});
+
+
+
 
 
 </script>

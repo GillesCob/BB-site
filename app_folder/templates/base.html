@@ -24,41 +24,43 @@
             <!--https://getbootstrap.com/docs/5.3/components/navbar/-->
             <nav class="navbar navbar-expand-lg bg-body-tertiary">
                 <div class="container-fluid">
-                    
 
+                    <!-- Je fais apparaitre une navbar pour passer d'un projet à un autre -->
+                    {% if count_projects >1 %} 
+                        <a class="nav-link dropdown-toggle navbar-brand" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{project_name_in_session}}</a>
+                        <ul class="dropdown-menu">
+                            <li class="nav-item">
+                                {% for project_name, project_id in projects_dict.items() %}
+                                    <form action="select_project" method="post">
+                                        <input type="hidden" name="project_id" value="{{ project_id }}">
+                                        <button type="submit" class="nav-link">{{ project_name }}</button>
+                                    </form>
+                                {% endfor %}
+                            </li>
+                        </ul>
+
+                    <!-- Je mets juste un titre neutre car pas de projet encore -->
+                    {%elif count_projects == 0 %} 
+                        <a class="navbar-brand" href="{{url_for('views.home_page')}}">Home</a>
+
+
+                    <!-- J'affiche juste le nom du seul projet dont le user fait partie -->
+                    {%else%} 
+                        {% for project_name, project_id in projects_dict.items() %}
+                            <a class="navbar-brand" href="{{url_for('views.home_page')}}">{{project_name}}</a>
+                        {% endfor %}
+
+                    {%endif%}
+
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    
                     <!-- Partie de gauche de la navbar -->
-                    <div class="collapse navbar-collapse" id="navbarNavDropdown"> 
+                    <div class="collapse navbar-collapse" id="navbarNav"> 
                         <ul class="navbar-nav">
 
-                            <!-- Je fais apparaitre une navbar pour passer d'un projet à un autre -->
-                            {% if count_projects >1 %} 
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle navbar-brand" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {{project_name_in_session}}</a>
-                                    <ul class="dropdown-menu">
-                                        <li class="nav-item">
-                                            {% for project_name, project_id in projects_dict.items() %}
-                                                <form action="select_project" method="post">
-                                                    <input type="hidden" name="project_id" value="{{ project_id }}">
-                                                    <button type="submit" class="nav-link">{{ project_name }}</button>
-                                                </form>
-                                            {% endfor %}
-                                        </li>
-                                    </ul>
-                                </li>
-
-                            <!-- Je mets juste un titre neutre car pas de projet encore -->
-                            {%elif count_projects == 0 %} 
-                                <a class="navbar-brand" href="{{url_for('views.home_page')}}">Home</a>
-
-
-                            <!-- J'affiche juste le nom du seul projet dont le user fait partie -->
-                            {%else%} 
-                                {% for project_name, project_id in projects_dict.items() %}
-                                    <a class="navbar-brand" href="{{url_for('views.home_page')}}">{{project_name}}</a>
-                                {% endfor %}
-
-                            {%endif%}
 
                             <!-- Eléments si le user est identifié -->
                             {% if current_user.is_authenticated %}
@@ -81,7 +83,7 @@
 
                     <!-- Partie de gauche de la navbar -->
                     {% if current_user.is_authenticated %}
-                        <div class="justify-content-end collapse navbar-collapse" id="navbarNavDropdown"> 
+                        <div class="justify-content-end collapse navbar-collapse" id="navbarNav"> 
                             <ul class="navbar-nav">
                                 
                                 <li class="nav-item dropdown">
@@ -91,12 +93,9 @@
                                         <li class="nav-item">
                                             <a class="nav-link" href="my_projects">Mes projets</a>
                                             <a class="nav-link" href="my_profil">Mon profil</a>
+                                            <a class="nav-link" href="/logout">Se déconnecter</a>
                                         </li>
                                     </ul>
-                                </li>
-                                
-                                <li class="nav-item">
-                                    <a class="nav-link" href="/logout">Se déconnecter</a>
                                 </li>
 
                             </ul>
