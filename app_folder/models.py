@@ -22,7 +22,7 @@ class Project(Document):
 
 
 class Pronostic(Document):
-    meta = {'collection': 'Pronostic_collection'}
+    meta = {'collection': 'Pronostics_collection'}
     
     user = ReferenceField('User', reverse_delete_rule=CASCADE)
     project = ReferenceField('Project', reverse_delete_rule=CASCADE)
