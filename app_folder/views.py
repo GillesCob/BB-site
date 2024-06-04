@@ -6,6 +6,9 @@ from datetime import datetime
 
 from bson import ObjectId
 
+import requests
+from bs4 import BeautifulSoup
+
 
 views = Blueprint("views", __name__)
 
@@ -95,6 +98,22 @@ def project_name_in_session():
         current_project_name = session['selected_project']['name']
         return current_project_name
 
+#Fonction afin de récupérer l'image du produit via les meta tags
+def get_amazon_product_image(url):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    
+    # Chercher le meta tag 'og:image'
+    og_image_tag = soup.find('meta', property='og:image')
+    
+    if og_image_tag and 'content' in og_image_tag.attrs:
+        return og_image_tag['content']
+    else:
+        return None
+
 #ROUTES -------------------------------------------------------------------------------------------------------------
 @views.route('/')
 @views.route('/home_page',methods=['GET'])
@@ -159,10 +178,13 @@ def add_product():
         user = user_id
         project = current_project_id
         
+        url = request.form['url']
+        photo = get_amazon_product_image(url)
+        
         name = request.form.get('product_name')
         description = request.form.get('product_description')
         price = request.form.get('product_price')
-        photo = request.form.get('product_photo')
+        # photo = request.form.get('product_photo')
         website = request.form.get('product_website')
         url_source = request.form.get('product_url_source')
         
