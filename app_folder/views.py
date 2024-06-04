@@ -93,7 +93,6 @@ def project_name_in_session():
         return current_project_name
 
 #ROUTES -------------------------------------------------------------------------------------------------------------
-@views.route('/')
 @views.route('/home_page',methods=['GET'])
 def home_page():
     
