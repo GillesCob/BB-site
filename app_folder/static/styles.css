@@ -65,11 +65,6 @@ h6{
 }
 
 
-
-
-
-
-
 input[type="date"]:before {
     content: attr(placeholder) !important;
     color: #aaa;

@@ -19,6 +19,7 @@ class Project(Document):
     admin = ReferenceField('User', reverse_delete_rule=CASCADE)
     users = ListField()
     pronostic = ListField()
+    product = ListField()
 
 
 class Pronostic(Document):
@@ -32,13 +33,16 @@ class Pronostic(Document):
     height = StringField(max_length=150, required=True)
     date = StringField(max_length=150, required=True)
     
+    
 class Product(Document):
     meta = {'collection': 'Products_collection'}
     
+    user = ReferenceField('User', reverse_delete_rule=CASCADE)
+    project = ReferenceField('Project', reverse_delete_rule=CASCADE)
     name = StringField(max_length=150)
     description = StringField(max_length=150)
     price = StringField(max_length=150)
-    image = StringField(max_length=150)
+    image = StringField(max_length=300)
     website = StringField(max_length=150)
     url_source = StringField(max_length=150)
     percentage_paid = StringField(max_length=150)

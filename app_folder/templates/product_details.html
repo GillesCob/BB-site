@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Product details
+{% endblock %}
+
+
+{% block content %}
+<div>
+    <!-- Mise en place d'une flèche pour revenir à menu_1.html -->
+    <a href="{{ url_for('views.menu_1') }}">
+        <img src="{{ url_for('static', filename='images/left-arrow.png') }}" alt="Logo" style="max-width: 50px; margin: 0 0 0 10px;">
+</div>
+
+<div class="container">
+    <div class="card text-center" style="max-width: 400px; margin: 0 auto;">
+        <img src="{{ product.image }}" class="card-img-top" alt="Image du produit {{ product.name }}">
+        <div class="card-body">
+            <h5 class="card-title">{{ product.name }}</h5>
+            <p class="card-text">{{ product.description }}</p>
+            <p class="card-text">Prix: {{ product.price }}€</p>
+            <p class="card-text">Site web: <a href="{{ product.website }}">{{ product.website }}</a></p>
+            <p class="card-text">URL Source: <a href="{{ product.url_source }}">{{ product.url_source }}</a></p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

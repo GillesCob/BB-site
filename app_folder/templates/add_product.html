@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Change username
+{% endblock %}
+
+
+{% block content %}
+    <div class="container d-flex justify-content-center align-items-center">
+        <div class="card p-4">
+            <h1 class="text-center mb-1">Ajouter un produit à la liste</h1>
+            <form method="post">
+                <div class="form-group">
+                    <label for="text">Titre du produit</label>
+                    <input type="text" class="form-control" name="product_name" placeholder="Nom du produit" required>
+                </div>
+                <div class="form-group">
+                    <label for="text">Description</label>
+                    <input type="text" class="form-control" name="product_description" placeholder="Description du produit" required>
+                </div>
+                <div class="form-group">
+                    <label for="text">Prix</label>
+                    <input type="text" class="form-control" name="product_price" placeholder="Prix du produit" required>
+                </div>
+                <div class="form-group">
+                    <label for="text">Photo</label>
+                    <input type="text" class="form-control" name="product_photo" placeholder="Photo du produit" required>
+                </div>
+                <div class="form-group">
+                    <label for="text">Site d'achat du produit</label>
+                    <input type="text" class="form-control" name="product_website" placeholder="Site d'origine du produit" required>
+                </div>
+                <div class="form-group">
+                    <label for="text">url du produit</label>
+                    <input type="text" class="form-control" name="product_url_source" placeholder="url du produit" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block mt-3">Ajouter</button>
+            </form>
+            {% if error %}
+            <div class="alert alert-danger mt-3">{{ error }}</div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

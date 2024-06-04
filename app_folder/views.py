@@ -1,8 +1,11 @@
 from flask import render_template, Blueprint, redirect, url_for, flash, request, session
 from flask_login import current_user, login_required, logout_user
-from .models import Pronostic, User, Project
+from .models import Pronostic, User, Project, Product
 
 from datetime import datetime
+
+from bson import ObjectId
+
 
 views = Blueprint("views", __name__)
 
@@ -112,17 +115,168 @@ def home_page():
 def menu_1():
     user_id = current_user.id
     elements_for_base = elements_for_base_template(user_id)
-    
     user_is_project_admin = Project.objects(admin=user_id).first()
+    
+    current_project_id = session['selected_project']['id']
+    current_project = Project.objects(id=current_project_id).first() #J'ai l'objet Project actuellement sauvegardé dans la session
+    
+    #Je souhaite maintenant récupérer les produits présents dans la Listfield "product" de mon projet
+    products_for_current_project = current_project.product
+    products = []
+    
+    for product_id in products_for_current_project:
+        product = Product.objects(id=product_id).first()
+        if product:
+            products.append({
+                'name': product.name,
+                'description': product.description,
+                'price': product.price,
+                'image': product.image,
+                'website': product.website,
+                'url_source': product.url_source,
+                'id': product.id
+            })
+    
         
     if user_is_project_admin : #Si le user actuel est l'admin d'un projet
         user_is_admin = True
-        return render_template('menu_1.html', user=current_user, user_is_admin=user_is_admin, **elements_for_base)
+        return render_template('menu_1.html', user=current_user, user_is_admin=user_is_admin, **elements_for_base, products=products)
 
     else: #Si le user actuel n'est pas l'admin d'un projet
         user_is_admin = False
         return render_template('menu_1.html', user=current_user, user_is_admin=user_is_admin, **elements_for_base)
     
+    
+@views.route('/add_product', methods=['GET', 'POST'])
+@login_required
+def add_product():
+    user_id = current_user.id
+    elements_for_base = elements_for_base_template(user_id)
+    current_project_id = session['selected_project']['id']
+    current_project = Project.objects(id=current_project_id).first()
+    
+    if request.method == 'POST':
+        user = user_id
+        project = current_project_id
+        
+        name = request.form.get('product_name')
+        description = request.form.get('product_description')
+        price = request.form.get('product_price')
+        photo = request.form.get('product_photo')
+        website = request.form.get('product_website')
+        url_source = request.form.get('product_url_source')
+        
+        new_product = Product(user=user, project=project, name=name, description=description, price=price, image=photo, website=website, url_source=url_source)
+        new_product.save()
+        
+        new_product_id = new_product.id
+        #J'ajoute l'id du nouveau pronostic dans la class Project
+        current_project.product.append(new_product_id)
+        current_project.save()
+        
+        flash(f'Produit créé avec succès !', category='success')
+        
+        return redirect(url_for('views.menu_1'))
+
+                
+    return render_template('add_product.html',  **elements_for_base)
+
+
+@views.route('/update_product/<product_id>', methods=['GET', 'POST'])
+@login_required
+def update_product(product_id):
+    user_id = current_user.id
+    elements_for_base = elements_for_base_template(user_id)
+    user_is_admin=True
+    
+    product = Product.objects(id=product_id).first()
+    print(product.name)
+    
+    products = []
+    products.append({
+                'name': product.name,
+                'description': product.description,
+                'price': product.price,
+                'image': product.image,
+                'website': product.website,
+                'url_source': product.url_source,
+                'id': product.id
+            })
+    
+    if request.method == 'POST':
+        name = request.form.get('product_name')
+        description = request.form.get('product_description')
+        price = request.form.get('product_price')
+        photo = request.form.get('product_photo')
+        website = request.form.get('product_website')
+        url_source = request.form.get('product_url_source')
+        
+        if name:
+            product.name = name
+        if description:
+            product.description = description
+        if price:
+            product.price = price
+        if photo:
+            product.image = photo
+        if website:
+            product.website = website
+        if url_source:
+            product.url_source = url_source
+        
+        # Enregistrer les modifications
+        product.save()
+        
+        
+        flash('Produit mis à jour avec succès !')
+        return redirect(url_for('views.menu_1'))
+    
+    return render_template('update_product.html', user=current_user, **elements_for_base, products=products, user_is_admin=user_is_admin)
+  
+
+@views.route('/product/<product_id>')
+@login_required
+def product_details(product_id):
+    user_id = current_user.id
+    elements_for_base = elements_for_base_template(user_id)
+    # Récupérer les détails du produit à partir de l'ID
+    product = Product.objects(id=product_id).first()
+    product_name = product.name
+    print(product_name)
+
+    if product:
+        return render_template('product_details.html', product=product, **elements_for_base)
+    else:
+        # Si le produit n'est pas trouvé, renvoyer une erreur 404 ou rediriger vers une autre page
+        return render_template('menu_1.html', **elements_for_base), 404
+
+
+@views.route('/delete_product/<product_id>', methods=['GET','POST'])
+@login_required
+def delete_product(product_id):
+    user_id = current_user.id
+    elements_for_base = elements_for_base_template(user_id)
+    print(product_id)
+    
+    # Récupérer les détails du produit à partir de l'ID
+    Product.objects(id=product_id).delete()
+    
+    user_is_admin = True
+    
+    # Conversion de product_id en ObjectId
+    product_oid = ObjectId(product_id)
+    
+    # Récupérer les détails du produit à partir de l'ID
+    Product.objects(id=product_oid).delete()
+    
+    # Suppression du produit dans les projets
+    project_with_product = Project.objects(product=product_oid).first()
+    if project_with_product:
+        project_with_product.update(pull__product=product_oid)
+        flash('Produit supprimé avec succès !', category='success') 
+        return redirect(url_for('views.menu_1'))
+
+    return render_template('menu_1.html', user_is_admin=user_is_admin, **elements_for_base)
 
 #ROUTES "PRONOS" -------------------------------------------------------------------------------------------------------------
 @views.route('/menu_2', methods=['GET', 'POST'])

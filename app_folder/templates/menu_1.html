@@ -7,50 +7,135 @@
 
 {% block content %}
 
-<style>
+{% if user_is_admin %}
 
-    .container {
-        text-align: center;
-    }
-    h1 {
-        color: #ffffff;
-        font-size: 3rem;
-        margin-bottom: 20px;
-        margin-top: 50px;
-    }
-    p {
-        color: #ffffff;
-        font-size: 1.5rem;
-    }
-</style>
-</head>
-<body>
 <div class="container">
-    <h1>Let's Go !</h1>
-    <p>Fonctionnalité en cours de développement !</p>
+    <h1 class="text-center">Liste de naissance</h1>
+    {% if products %}
+        <div class="custom-card">
+            {% for product in products %}
+                <div>
+                    <div class="card">
+                        <img class="card-img-left" src="{{ product.image }}" alt="Image du produit {{ product.name }}">
+                        <div class="card-body card-body-right">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text"><strong>Prix:</strong> {{ product.price }}€</p>
+                            <a href="{{ url_for('views.product_details', product_id=product.id) }}" class="btn btn-success mt-2">Plus d'informations</a>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <!-- Bouton "Modifier" aligné à gauche -->
+                            <!-- <form action="{{ url_for('views.update_product', product_id=product.id) }}" method="post">
+                                <input type="hidden" name="product_id" value="product.id">
+                                <button type="submit" class="btn btn-info">Modifier</button>
+                            </form> -->
+                            <a href="{{ url_for('views.update_product', product_id=product.id) }}" class="btn btn-info mt-2">Modifier</a>
+                        </div>
+                        <div class="col-6">
+                            
+                            <!-- Bouton "Supprimer" aligné à droite -->
+                            <form action="{{ url_for('views.delete_product', product_id=product.id) }}" method="post">
+                                <input type="hidden" name="product_id" value="product.id">
+                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-center">Aucun produit trouvé pour ce projet.</p>
+    {% endif %}
+</div> 
 
+<div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-5">
+    <a href="/add_product" class="btn btn-primary">Ajouter un produit</a>
 </div>
 
-<!--Night mode-->
+{% else %}
+<p>Possible de consulter les produits de la liste</p>
+{% endif %}
+
+
+
+
+
 <style>
-    body{
-        background-color: #000000;
-        color: white;
-    }
+.card {
+    display: flex;
+    flex-direction: row;
+}
+
+.card-img-left {
+    width: 50%;
+    object-fit: cover;
+}
+
+.card-body-right {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.custom-card {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.modal {
+    display: none; /* Masquer la fenêtre modale par défaut */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+    
+.modal-content {
+    background-color: #991111;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.close-icon {
+    cursor: pointer;
+}
 </style>
 
 
-<!-- {% if user_is_admin %}
-<p>Possible d'ajouter un produit à la liste de naissance</p>
+<!-- Structure de la fenêtre modale pour supprimer son profil -->
+<div id="myModal_delete_product" class="modal">
+    <div class="modal-content">
+        <span class="close-icon" onclick="closeModal_delete_product()" style="float:right;">&times;</span>
+        <div class="col offset-md-3 col-md-6 col-sm-12">
+            <form method="POST" action="{{ url_for('views.menu_1') }}" class="p-5 text-center">
+                <p>ATTENTION cette action est irréversible !</p>
+                <div class="d-grid gap-2 col-12 mx-auto">
+                    <button type="submit" class="btn btn-danger">Supprimer le produit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-{%else%}
-<p>Possible de consulter les produits de la liste</p> -->
 
-{%endif%}
+<script>
+function openModal_delete_product() {
+    document.getElementById('myModal_delete_product').style.display = 'block';
+}
 
-
-
-
-
+function closeModal_delete_product() {
+    document.getElementById('myModal_delete_product').style.display = 'none';
+}
+</script>
 
 {% endblock %}
