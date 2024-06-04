@@ -255,7 +255,6 @@ def update_product(product_id):
     
     return render_template('update_product.html', user=current_user, **elements_for_base, products=products, user_is_admin=user_is_admin)
   
-
 @views.route('/product/<product_id>')
 @login_required
 def product_details(product_id):
@@ -271,7 +270,6 @@ def product_details(product_id):
     else:
         # Si le produit n'est pas trouvé, renvoyer une erreur 404 ou rediriger vers une autre page
         return render_template('menu_1.html', **elements_for_base), 404
-
 
 @views.route('/delete_product/<product_id>', methods=['GET','POST'])
 @login_required
