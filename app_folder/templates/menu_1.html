@@ -7,59 +7,75 @@
 
 {% block content %}
 
-{% if user_is_admin %}
+{% if session.selected_project.id %}
+    <div class="container">
+        <h1 class="text-center">Liste de naissance</h1>
+        {% if products %}
+            <div class="custom-card">
+                {% for product in products %}
+                    <div>
+                        <div class="card">
+                            <!-- <img class="card-img-left" src="{{ product.image }}" alt="Image du produit {{ product.name }}"> -->
+                            <div class="card-body">
+                                <h5 class="card-title">{{ product.name }}</h5>
+                                
+                                {% if product.left_to_pay == 0 %}
+                                    <p>Produit financé, merci !</p>
+                                {% else %}
+                                    <p class="card-text"><strong>Montant restant :</strong> {{ product.left_to_pay }}€</p>
+                                    <a href="{{ url_for('views.product_details', product_id=product.id) }}" class="btn btn-success mt-2">Plus d'informations</a>
+                                {% endif %}
+                            </div>
+                        </div>
 
-<div class="container">
-    <h1 class="text-center">Liste de naissance</h1>
-    {% if products %}
-        <div class="custom-card">
-            {% for product in products %}
-                <div>
-                    <div class="card">
-                        <img class="card-img-left" src="{{ product.image }}" alt="Image du produit {{ product.name }}">
-                        <div class="card-body card-body-right">
-                            <h5 class="card-title">{{ product.name }}</h5>
-                            <p class="card-text"><strong>Prix:</strong> {{ product.price }}€</p>
-                            <a href="{{ url_for('views.product_details', product_id=product.id) }}" class="btn btn-success mt-2">Plus d'informations</a>
-                        </div>
+                        {% if user_is_admin %}
+                            <div class="card_button gap-2">
+
+                                    <!-- Bouton "Modifier" aligné à gauche -->
+                                    <a href="{{ url_for('views.update_product', product_id=product.id) }}" class="btn btn-info">Modifier</a>
+
+                                    <!-- Bouton "Supprimer" aligné à droite -->
+                                    <form action="{{ url_for('views.delete_product', product_id=product.id) }}" method="post">
+                                        <input type="hidden" name="product_id" value="product.id">
+                                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                                    </form>
+                            </div>
+                        {% endif %}
                     </div>
-                    <div class="row mt-2">
-                        <div class="col-6">
-                            <!-- Bouton "Modifier" aligné à gauche -->
-                            <!-- <form action="{{ url_for('views.update_product', product_id=product.id) }}" method="post">
-                                <input type="hidden" name="product_id" value="product.id">
-                                <button type="submit" class="btn btn-info">Modifier</button>
-                            </form> -->
-                            <a href="{{ url_for('views.update_product', product_id=product.id) }}" class="btn btn-info mt-2">Modifier</a>
-                        </div>
-                        <div class="col-6">
-                            
-                            <!-- Bouton "Supprimer" aligné à droite -->
-                            <form action="{{ url_for('views.delete_product', product_id=product.id) }}" method="post">
-                                <input type="hidden" name="product_id" value="product.id">
-                                <button type="submit" class="btn btn-danger">Supprimer</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center">Aucun produit trouvé pour ce projet.</p>
+        {% endif %}
+    </div> 
+    
+
+    {% if user_is_admin %}
+        <div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-5">
+            <a href="/add_product" class="btn btn-primary">Ajouter un produit</a>
         </div>
-    {% else %}
-        <p class="text-center">Aucun produit trouvé pour ce projet.</p>
     {% endif %}
-</div> 
 
-<div class="col offset-md-3 col-md-6 col-sm-12 text-center mt-5">
-    <a href="/add_product" class="btn btn-primary">Ajouter un produit</a>
-</div>
+
+
+ 
+
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+
 
 {% else %}
-<p>Possible de consulter les produits de la liste</p>
+Aucun projet sélectionné.
 {% endif %}
-
-
-
-
 
 <style>
 .card {
@@ -67,17 +83,7 @@
     flex-direction: row;
 }
 
-.card-img-left {
-    width: 50%;
-    object-fit: cover;
-}
 
-.card-body-right {
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
 
 .custom-card {
     display: flex;
@@ -109,6 +115,13 @@
 .close-icon {
     cursor: pointer;
 }
+
+.progress {
+    background-color: #6495ED; /* Couleur de fond du reste à faire */
+  }
+.progress-bar-custom {
+    background-color: #FF69B4; /* Couleur de la barre de progression */
+  }
 </style>
 
 
@@ -128,14 +141,33 @@
 </div>
 
 
-<script>
-function openModal_delete_product() {
-    document.getElementById('myModal_delete_product').style.display = 'block';
-}
 
-function closeModal_delete_product() {
-    document.getElementById('myModal_delete_product').style.display = 'none';
-}
+
+
+<script>
+    function openModal_delete_product() {
+        document.getElementById('myModal_delete_product').style.display = 'block';
+    }
+
+    function closeModal_delete_product() {
+        document.getElementById('myModal_delete_product').style.display = 'none';
+    }
+
+
+    // Fonction pour mettre à jour la valeur du poids
+    function updatePercentagetValue(value) {
+        document.getElementById("percentageValue").textContent = value;
+    }
+
+    // Mettre à jour la valeur de départ du curseur pour le poids
+    window.onload = function() {
+        var Initialpercentage = "{{percentage_paid}}";
+        document.getElementById("percentage").value = Initialpercentage;
+        updatePercentagetValue(Initialpercentage);
+    }
+
+
+
 </script>
 
 {% endblock %}

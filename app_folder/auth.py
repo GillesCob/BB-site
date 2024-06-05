@@ -34,6 +34,12 @@ def login():
                         project.update(push__users=user_id)
                         flash(f'Projet {project_name} rejoint avec succès !', category='success')
                         login_user(user, remember=True)
+                        
+                        
+                        session['selected_project'] = {
+                        'id': str(project.id),
+                        'name': project.name
+            }
                         return redirect(url_for('views.menu_2', count_projects=count_projects))
                     
                     else:

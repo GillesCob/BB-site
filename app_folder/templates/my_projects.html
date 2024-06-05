@@ -11,6 +11,35 @@
     {% if user_is_admin %}
 
         <h1 class="page_title">Mon projet {{project_name}}</h1>
+</br>
+        <h3 class="text-center">Participations à la liste de naissance</h3>
+        {% if user_participations %}
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Produit</th>
+                        <th>Participation</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for email, participations in user_participations.items() %}
+                        {% for participation in participations %}
+                            <tr>
+                                <td>{{ email }}</td>
+                                <td>{{ participation[1] }}</td>
+                                <td>{{ participation[2] }}€</td>
+                                <td>{{ participation[3] }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        {%else%}
+        <p class="text-center">Pas encore de participation</p>
+        {%endif%}
         </br>
         <div class="col offset-md-3 col-md-6 col-sm-12 text-center">
             <button class="btn btn-primary" onclick="copyTextToClipboard()">Copier votre lien d'affiliation</button>
@@ -84,6 +113,23 @@
     .close-icon {
         cursor: pointer;
     }
+
+
+    table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
 
 </style>
 

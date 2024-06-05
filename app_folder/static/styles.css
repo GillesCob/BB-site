@@ -11,7 +11,7 @@
 /* Add padding and background color to the card */
 .card {
     padding: 20px;
-    background-color: #f8f9fa;
+    background-color: #eff1f4;
     border: none;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -19,6 +19,13 @@
     max-width: 400px;
     text-align: center;
     margin-top: 100px;
+    min-width: 400px;
+}
+
+.card_button {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
 }
 
 /* Add space between form elements */
