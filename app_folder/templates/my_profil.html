@@ -42,13 +42,15 @@
         width: 80%;
     }
 
+    .close-icon {
+        cursor: pointer;
+    }
 </style>
-
 
 <!-- Structure de la fenêtre modale pour supprimer son profil -->
 <div id="myModal_delete_profil" class="modal">
     <div class="modal-content">
-    <span onclick="closeModal_delete_profil()" style="float:right;">&times;</span>
+        <span class="close-icon" onclick="closeModal_delete_profil()" style="float:right;">&times;</span>
         <div class="col offset-md-3 col-md-6 col-sm-12">
             <form method="POST" action="{{ url_for('auth.delete_account') }}" class="p-5 text-center">
                 <p>ATTENTION cette action est irréversible !</p>
@@ -69,6 +71,7 @@
     function closeModal_delete_profil() {
         document.getElementById('myModal_delete_profil').style.display = 'none';
     }
-    </script>
+</script>
+
 
 {% endblock %}

@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-from mongoengine import Document, StringField, ReferenceField, CASCADE, ListField, EmailField
+from mongoengine import Document, StringField, ReferenceField, CASCADE, ListField, EmailField, IntField, DateTimeField
 
 
    
@@ -19,6 +19,7 @@ class Project(Document):
     admin = ReferenceField('User', reverse_delete_rule=CASCADE)
     users = ListField()
     pronostic = ListField()
+    product = ListField()
 
 
 class Pronostic(Document):
@@ -31,3 +32,26 @@ class Pronostic(Document):
     weight = StringField(max_length=150, required=True)
     height = StringField(max_length=150, required=True)
     date = StringField(max_length=150, required=True)
+    
+    
+class Product(Document):
+    meta = {'collection': 'Products_collection'}
+    
+    user = ReferenceField('User', reverse_delete_rule=CASCADE)
+    project = ReferenceField('Project', reverse_delete_rule=CASCADE)
+    name = StringField(max_length=150)
+    description = StringField(max_length=150)
+    price = IntField()
+    already_paid = IntField()
+    image = StringField(max_length=300)
+    url_source = StringField(max_length=150)
+    participation = ListField()
+    
+class Participation(Document):
+    meta = {'collection': 'Participation_collection'}
+
+    user = ReferenceField('User')
+    project = ReferenceField('Project', reverse_delete_rule=CASCADE)
+    product = ReferenceField('Product')
+    amount = IntField()
+    participation_date = DateTimeField()

@@ -1,8 +1,15 @@
 from flask import render_template, Blueprint, redirect, url_for, flash, request, session
 from flask_login import current_user, login_required, logout_user
-from .models import Pronostic, User, Project
+from .models import Pronostic, User, Project, Product, Participation
 
 from datetime import datetime
+
+from bson import ObjectId
+
+# from bs4 import BeautifulSoup
+# import requests
+
+
 
 views = Blueprint("views", __name__)
 
@@ -92,6 +99,22 @@ def project_name_in_session():
         current_project_name = session['selected_project']['name']
         return current_project_name
 
+#Fonction afin de récupérer l'image du produit via les meta tags
+# def get_amazon_product_image(url):
+#     headers = {
+#         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+#     }
+#     response = requests.get(url, headers=headers)
+#     soup = BeautifulSoup(response.content, 'html.parser')
+    
+#     # Chercher le meta tag 'og:image'
+#     og_image_tag = soup.find('meta', property='og:image')
+    
+#     if og_image_tag and 'content' in og_image_tag.attrs:
+#         return og_image_tag['content']
+#     else:
+#         return None
+
 #ROUTES -------------------------------------------------------------------------------------------------------------
 @views.route('/home_page',methods=['GET'])
 def home_page():
@@ -112,16 +135,243 @@ def menu_1():
     user_id = current_user.id
     elements_for_base = elements_for_base_template(user_id)
     
-    user_is_project_admin = Project.objects(admin=user_id).first()
-        
-    if user_is_project_admin : #Si le user actuel est l'admin d'un projet
-        user_is_admin = True
-        return render_template('menu_1.html', user=current_user, user_is_admin=user_is_admin, **elements_for_base)
-
-    else: #Si le user actuel n'est pas l'admin d'un projet
-        user_is_admin = False
-        return render_template('menu_1.html', user=current_user, user_is_admin=user_is_admin, **elements_for_base)
+    # Si le user est déjà dans un projet et que je n'ai rien dans la session (parce que je viens de me connecter), je récupère le premier projet dans lequel le user est afin d'ouvrir une session et ne pas avoir à choisir un projet à chaque fois que je me connecte.
+    #Si une session est déjà ouverte, je skip cette étape
+    if 'selected_project' not in session:
+        user_in_project = Project.objects(users__contains=user_id)
+        if user_in_project:
+            first_project = user_in_project.first() 
+            first_project_id = first_project.id
+            
+            # Ajouter les données du premier projet trouvé dans la session
+            session['selected_project'] = {
+                'id': str(first_project_id),
+                'name': first_project.name
+            }
     
+    try:
+        current_project_id = session['selected_project']['id'] #J'ai l'id du projet actuellement sauvegardé dans la session
+        current_project = Project.objects(id=current_project_id).first() #J'ai l'objet Project actuellement sauvegardé dans la session
+    
+    
+        user_is_project_admin = Project.objects(admin=user_id).first()
+        
+        current_project_id = session['selected_project']['id']
+        current_project = Project.objects(id=current_project_id).first() #J'ai l'objet Project actuellement sauvegardé dans la session
+        
+        #Je souhaite maintenant récupérer les produits présents dans la Listfield "product" de mon projet
+        products_for_current_project = current_project.product
+        products = []
+        
+        for product_id in products_for_current_project:
+            product = Product.objects(id=product_id).first()
+            if product:
+                products.append({
+                    'name': product.name,
+                    'description': product.description,
+                    'price': product.price,
+                    # 'image': product.image,
+                    'url_source': product.url_source,
+                    'already_paid':product.already_paid,
+                    'id': product.id,
+                    'left_to_pay': product.price-product.already_paid
+                })
+        
+        # Trier les produits en fonction du montant restant à payer (left_to_pay)
+        products = sorted(products, key=lambda x: x['left_to_pay'], reverse=True)
+         
+        if user_is_project_admin : #Si le user actuel est l'admin d'un projet
+            user_is_admin = True
+            return render_template('menu_1.html', user=current_user, user_is_admin=user_is_admin, **elements_for_base, products=products)
+
+        else: #Si le user actuel n'est pas l'admin d'un projet
+            user_is_admin = False
+            return render_template('menu_1.html', user=current_user, user_is_admin=user_is_admin, **elements_for_base, products=products)
+    
+    
+    except (KeyError, AttributeError):
+        flash("Veuillez créer ou rejoindre un projet avant d'accéder aux pronostics", category='error')
+        return redirect(url_for('views.my_projects', user=current_user, **elements_for_base))
+    
+@views.route('/add_product', methods=['GET', 'POST'])
+@login_required
+def add_product():
+    user_id = current_user.id
+    elements_for_base = elements_for_base_template(user_id)
+    current_project_id = session['selected_project']['id']
+    current_project = Project.objects(id=current_project_id).first()
+    
+    if request.method == 'POST':
+        user = user_id
+        project = current_project_id
+        
+        # url = request.form['url']
+        # photo = get_amazon_product_image(url)
+        
+        name = request.form.get('product_name')
+        description = request.form.get('product_description')
+        price = request.form.get('product_price')
+        # photo = request.form.get('product_photo')
+        url_source = request.form.get('product_url_source')
+        already_paid = 0
+        
+        new_product = Product(user=user, project=project, name=name, description=description, price=price, url_source=url_source, already_paid=already_paid)
+        new_product.save()
+        
+        new_product_id = new_product.id
+        
+        #J'ajoute l'id du nouveau produit dans la class Project
+        current_project.product.append(new_product_id)
+        current_project.save()
+        
+        flash(f'Produit créé avec succès !', category='success')
+        
+        return redirect(url_for('views.menu_1'))
+
+                
+    return render_template('add_product.html',  **elements_for_base)
+
+@views.route('/update_product/<product_id>', methods=['GET', 'POST'])
+@login_required
+def update_product(product_id):
+    user_id = current_user.id
+    elements_for_base = elements_for_base_template(user_id)
+    user_is_admin=True
+    
+    product = Product.objects(id=product_id).first()
+    
+    products = []
+    products.append({
+                'name': product.name,
+                'description': product.description,
+                'price': product.price,
+                # 'image': product.image,
+                'url_source': product.url_source,
+                'id': product.id
+            })
+    
+    if request.method == 'POST':
+        name = request.form.get('product_name')
+        description = request.form.get('product_description')
+        price = request.form.get('product_price')
+        # photo = request.form.get('product_photo')
+        url_source = request.form.get('product_url_source')
+        
+        if name:
+            product.name = name
+        if description:
+            product.description = description
+        if price:
+            product.price = price
+        # if photo:
+        #     product.image = photo
+        if url_source:
+            product.url_source = url_source
+        
+        # Enregistrer les modifications
+        product.save()
+        
+        
+        flash('Produit mis à jour avec succès !')
+        return redirect(url_for('views.menu_1'))
+    
+    return render_template('update_product.html', user=current_user, **elements_for_base, products=products, user_is_admin=user_is_admin)
+  
+@views.route('/product/<product_id>')
+@login_required
+def product_details(product_id):
+    user_id = current_user.id
+    elements_for_base = elements_for_base_template(user_id)
+    # Récupérer les détails du produit à partir de l'ID
+    product = Product.objects(id=product_id).first()
+    
+    left_to_pay = product.price-product.already_paid
+
+    if product:
+        return render_template('product_details.html', product=product, **elements_for_base, left_to_pay=left_to_pay)
+    else:
+        # Si le produit n'est pas trouvé, renvoyer une erreur 404 ou rediriger vers une autre page
+        return render_template('menu_1.html', **elements_for_base), 404
+
+@views.route('/product_participation/<product_id>')
+@login_required
+def product_participation(product_id):
+    user_id = current_user.id
+    elements_for_base = elements_for_base_template(user_id)
+    # Récupérer les détails du produit à partir de l'ID
+    product = Product.objects(id=product_id).first()
+    
+    left_to_pay = product.price-product.already_paid
+
+    if product:
+        return render_template('product_participation.html', product=product, **elements_for_base, left_to_pay=left_to_pay)
+    else:
+        # Si le produit n'est pas trouvé, renvoyer une erreur 404 ou rediriger vers une autre page
+        return render_template('menu_1.html', **elements_for_base), 404
+
+@views.route('/confirm_participation/<product_id>', methods=['GET','POST'])
+@login_required
+def confirm_participation(product_id):
+    user_id = current_user.id
+    elements_for_base = elements_for_base_template(user_id)
+    
+    current_project = session.get('selected_project')
+    project_id = current_project['id']
+    
+    
+    # Récupérer les détails du produit à partir de l'ID
+    product = Product.objects(id=product_id).first()
+    
+    if request.method == 'POST':
+        participation = request.form.get('participation_range')
+        
+        new_participation = Participation(user=user_id, project=project_id, product=product_id, amount=participation, participation_date=datetime.now())
+        new_participation.save()
+        
+        product.already_paid += int(participation)
+        product.participation.append(new_participation.id)
+        product.save()
+        
+        participation_amount = new_participation.amount
+        print(participation_amount)
+        
+        return render_template('confirm_participation.html', product=product, **elements_for_base, participation_amount=participation_amount)
+    
+    if product:
+        return render_template('product_participation.html', product=product, **elements_for_base)
+    else:
+        # Si le produit n'est pas trouvé, renvoyer une erreur 404 ou rediriger vers une autre page
+        return render_template('menu_1.html', **elements_for_base), 404
+
+
+@views.route('/delete_product/<product_id>', methods=['GET','POST'])
+@login_required
+def delete_product(product_id):
+    user_id = current_user.id
+    elements_for_base = elements_for_base_template(user_id)
+    user_is_admin = True
+        
+    # Conversion de product_id en ObjectId
+    product_id = ObjectId(product_id)
+    
+    # Je récupère l'objet Product concerné
+    product = Product.objects(id=product_id).first()
+    participation_list = product.participation
+    
+    for participation_id in participation_list:
+        Participation.objects(id=participation_id).delete()
+
+    
+    # Suppression du produit dans les projets
+    project_with_product = Project.objects(product=product_id).first()
+    if project_with_product:
+        project_with_product.update(pull__product=product_id)
+        
+        product.delete()
+        flash('Produit supprimé avec succès !', category='success') 
+        return redirect(url_for('views.menu_1'))
+
+    return render_template('menu_1.html', user_is_admin=user_is_admin, **elements_for_base)
 
 #ROUTES "PRONOS" -------------------------------------------------------------------------------------------------------------
 @views.route('/menu_2', methods=['GET', 'POST'])
@@ -335,7 +585,6 @@ def menu_3():
     elements_for_base = elements_for_base_template(user_id)
 
     project = Project.objects(admin=user_id).first() #J'ai l'objet project pour lequel le user actuel est l'admin
-
     
     if project : #Si le user actuel est l'admin d'un projet
         project_name = project.name
@@ -364,28 +613,52 @@ def my_profil():
 @login_required
 def my_projects():
     user_id = current_user.id
-    
     user_email = current_user.email
     admin_project = Project.objects(admin=user_id).first() #J'ai l'objet project pour lequel le user actuel est l'admin
     
     base_elements = elements_for_base_template(user_id)
     projects_dict_special = base_elements['projects_dict']
     
-
     
     if admin_project : #Si le user actuel est l'admin d'un projet
-        elements_for_base = elements_for_base_template(user_id)
+        user_is_admin = True
         project_id = admin_project.id
         project_name = admin_project.name
         projects_dict_special.pop(project_name) #Je retire le projet pour lequel le user actuel est l'admin de la liste des projets (utile dans la liste des projets dont il fait partie dans la page my_projects)
-        user_is_admin = True
-        return render_template('my_projects.html', user=current_user, project_id=project_id, project_name=project_name, user_is_admin=user_is_admin, **elements_for_base, user_email=user_email, projects_dict_special=projects_dict_special)
+        
+        
+        #Je vais récupérer ici les infos concernant les participants à la liste de naissance
+        user_participations = {}
+        
+        project_products= admin_project.product #Je récupère les produits du projet pour lequel mon user est l'admin
+        
+        for project_product in project_products: #Pour chaque produit de ce projet
+            product_id = ObjectId(project_product) #Je récupère son id
+            #J'ai l'id de mon produit, je vais aller chercher les id des participations pour ce produit
+            product_participations = Participation.objects(product=product_id)
+            
+            for product_participation in product_participations:
+                user = product_participation.user
+                user_id = ObjectId(user.id)
+                
+                user_email = User.objects(id=user_id).first().email
+                product_name = Product.objects(id=product_id).first().name
+                amount = product_participation.amount
+                date = product_participation.participation_date
+                date = date.strftime('%d-%m-%Y')
+
+                # Ajoutez la participation au dictionnaire user_participations
+                if user_email not in user_participations:
+                    user_participations[user_email] = []  # Créez une liste vide pour chaque nouvel utilisateur
+                
+                user_participations[user_email].append((user_email, product_name, amount, date))
+
+        return render_template('my_projects.html', user=current_user, project_id=project_id, project_name=project_name, user_is_admin=user_is_admin, **base_elements, user_email=user_email, projects_dict_special=projects_dict_special, user_participations=user_participations)
 
     else: #Si le user actuel n'est pas l'admin d'un projet
-        elements_for_base = elements_for_base_template(user_id)
         user_is_admin = False
         projects_dict_special = base_elements['projects_dict']
-        return render_template('my_projects.html', user=current_user, user_is_admin=user_is_admin, **elements_for_base, user_email=user_email, projects_dict_special=projects_dict_special)
+        return render_template('my_projects.html', user=current_user, user_is_admin=user_is_admin, **base_elements, user_email=user_email, projects_dict_special=projects_dict_special)
 
 @views.route('/my_account')
 @login_required
